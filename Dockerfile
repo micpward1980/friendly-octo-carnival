@@ -23,17 +23,21 @@ RUN echo 'server {\n\
     root /app/web-ui;\n\
     index index.html;\n\
     location / {\n\
-        try_files $uri $uri/ =404;\n\
+        try_files $uri $uri/ @api;\n\
     }\n\
-    location /claims {\n\
+    location @api {\n\
         proxy_pass http://localhost:8000;\n\
         proxy_set_header Host $host;\n\
         proxy_set_header X-Real-IP $remote_addr;\n\
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n\
+        proxy_set_header X-Forwarded-Proto $scheme;\n\
     }\n\
-    location /verify {\n\
-        proxy_pass http://localhost:8001;\n\
+    location /api/ {\n\
+        proxy_pass http://localhost:8000/;\n\
         proxy_set_header Host $host;\n\
         proxy_set_header X-Real-IP $remote_addr;\n\
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n\
+        proxy_set_header X-Forwarded-Proto $scheme;\n\
     }\n\
 }' > /etc/nginx/sites-available/default
 
